@@ -141,9 +141,10 @@ def registration():
 # Defining the creating product function. This allows you to add new products to your database.
 @app.route('/create-product/', methods=["POST"])
 def create_product():
-    response = {}
+    try:
+     response = {}
 
-    if request.method == "POST":
+     if request.method == "POST":
         category = request.form['category']
         name = request.form['name']
         price = request.form['price']
@@ -160,6 +161,8 @@ def create_product():
             conn.commit()
             response["status_code"] = 201
             response['description'] = "Product Table Added Successfully"
+
+    except:
         return response
 
 
@@ -181,29 +184,34 @@ def get_product():
 # This function allows you to delete products from the database.
 @app.route("/delete-product/<int:product_id>/")
 def delete_product(product_id):
-    response = {}
+    try:
+        response = {}
 
-    with sqlite3.connect("databases.db") as conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM product WHERE id=" + str(product_id))
-        conn.commit()
-        response['status_code'] = 200
-        response['message'] = "Product Deleted Successfully."
-    return response
+        with sqlite3.connect("databases.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM product WHERE id=" + str(product_id))
+            conn.commit()
+            response['status_code'] = 200
+            response['message'] = "Product Deleted Successfully."
+    except:
+        return response
 
 
 # The view one function lets you view one product of choice.
 @app.route('/view-one/<int:product_id>/')
 def view_one_product(product_id):
-    response = {}
+    try:
+        response = {}
 
-    with sqlite3.connect("database.db") as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM product WHERE id=?", str(product_id))
-        product = cursor.fetchone()
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM product WHERE id=?", str(product_id))
+            product = cursor.fetchone()
 
-        response['status_code'] = 200
-        response['data'] = product
+            response['status_code'] = 200
+            response['data'] = product
+
+    except:
         return jsonify(response)
 
 
@@ -211,63 +219,66 @@ def view_one_product(product_id):
 @app.route('/edit-product/<int:product_id>/', methods=["PUT"])
 # @jwt_required()
 def edit_product(product_id):
-    response = {}
+    try:
+        response = {}
 
-    if request.method == "PUT":
-        with sqlite3.connect('database.db') as conn:
-            incoming_data = dict(request.json)
-            put_data = {}
+        if request.method == "PUT":
+            with sqlite3.connect('database.db') as conn:
+                incoming_data = dict(request.json)
+                put_data = {}
 
-            if incoming_data.get("category") is not None:
-                put_data["category"] = incoming_data.get("category")
+                if incoming_data.get("category") is not None:
+                    put_data["category"] = incoming_data.get("category")
 
-                with sqlite3.connect('database.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET category =? WHERE id=?", (put_data["category"], product_id))
+                    with sqlite3.connect('database.db') as conn:
+                        cursor = conn.cursor()
+                        cursor.execute("UPDATE product SET category =? WHERE id=?", (put_data["category"], product_id))
 
-                    conn.commit()
-                    response['message'] = "Update Successfully"
-                    response['status_code'] = 200
+                        conn.commit()
+                        response['message'] = "Update Successfully"
+                        response['status_code'] = 200
 
-            elif incoming_data.get("name") is not None:
-                put_data['name'] = incoming_data.get('name')
+                elif incoming_data.get("name") is not None:
+                    put_data['name'] = incoming_data.get('name')
 
-                with sqlite3.connect('database.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET name =? WHERE id=?", (put_data["name"], product_id))
-                    conn.commit()
+                    with sqlite3.connect('database.db') as conn:
+                        cursor = conn.cursor()
+                        cursor.execute("UPDATE product SET name =? WHERE id=?", (put_data["name"], product_id))
+                        conn.commit()
 
-                    response["content"] = "Content Updated Successfully"
-                    response["status_code"] = 200
+                        response["content"] = "Content Updated Successfully"
+                        response["status_code"] = 200
 
-            elif incoming_data.get("price") is not None:
-                put_data['price'] = incoming_data.get('price')
+                elif incoming_data.get("price") is not None:
+                    put_data['price'] = incoming_data.get('price')
 
-                with sqlite3.connect('database.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET price =? WHERE id=?", (put_data["price"], product_id))
-                    conn.commit()
+                    with sqlite3.connect('database.db') as conn:
+                        cursor = conn.cursor()
+                        cursor.execute("UPDATE product SET price =? WHERE id=?", (put_data["price"], product_id))
+                        conn.commit()
 
-                    response["content"] = "Content Updated Successfully"
-                    response["status_code"] = 200
-
-    return response
+                        response["content"] = "Content Updated Successfully"
+                        response["status_code"] = 200
+    except:
+        return response
 
 
 # This function allows you to delete products from the database.
 @app.route('/get-product/<int:product_id>/', methods=["GET"])
 def get_post(product_id):
-    response = {}
+    try:
+        response = {}
 
-    with sqlite3.connect("database.db") as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM product WHERE id=" + str(product_id))
+        with sqlite3.connect("database.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM product WHERE id=" + str(product_id))
 
-        response["status_code"] = 200
-        response["description"] = "Product Retrieved Successfully"
-        response["data"] = cursor.fetchone()
+            response["status_code"] = 200
+            response["description"] = "Product Retrieved Successfully"
+            response["data"] = cursor.fetchone()
 
-    return jsonify(response)
+    except:
+        return jsonify(response)
 
 
 if __name__ == "__main__":
