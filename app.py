@@ -1,3 +1,4 @@
+# These are all my imports which run in the background of my programme.
 import hmac
 import sqlite3
 from flask_mail import Mail, Message
@@ -6,6 +7,7 @@ from flask_jwt import JWT, jwt_required, current_identity
 from flask_cors import CORS
 
 
+# Defining the User class, which holds all the code for the programme.
 class User(object):
     def __init__(self, id, username, password):
         self.id = id
@@ -13,6 +15,8 @@ class User(object):
         self.password = password
 
 
+# Defining the user table which creates a new database if there isn't a available one,
+# this holds all the users information who has already registered.
 def init_user_table():
     conn = sqlite3.connect('database.db')
     print("Opened Database Successfully")
@@ -29,6 +33,8 @@ def init_user_table():
 init_user_table()
 
 
+# Defining the fetching function, which allows the code to fetch data from the database,
+# which was already created for user's information.
 def fetch_users():
     with sqlite3.connect('database.db') as conn:
         cursor = conn.cursor()
@@ -45,6 +51,8 @@ def fetch_users():
 users = fetch_users()
 
 
+# Defining the product table which creates a new database if there isn't a available one,
+# this holds all the products information.
 def init_product_table():
     with sqlite3.connect('database.db') as conn:
         conn.execute("CREATE TABLE IF NOT EXISTS product(id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -63,6 +71,8 @@ username_table = {u.username: u for u in users}
 userid_table = {u.id: u for u in users}
 
 
+# Authentication function which authorizes the users username and password,
+# checking if they are already registered.
 def authenticate(username, password):
     user = username_table.get(username, None)
     if user and hmac.compare_digest(user.password.encode('utf-8'), password.encode('utf-8')):
@@ -74,6 +84,7 @@ def identity(payload):
     return userid_table.get(user_id, None)
 
 
+# Email configurations that helps the email function run.
 app = Flask(__name__)
 app.debug = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -95,6 +106,9 @@ def protected():
     return '%s' % current_identity
 
 
+# Defining the registration function, fetching all the information that the user has filled in then
+# stores it in the database, sends a 201 success code and also sends the user an email
+# that says that their registration was successful.
 @app.route('/registration/', methods=["POST"])
 def registration():
     response = {}
@@ -124,6 +138,7 @@ def registration():
                 return "Message Sent"
 
 
+# Defining the creating product function. This allows you to add new products to your database.
 @app.route('/create-product/', methods=["POST"])
 def create_product():
     response = {}
@@ -148,6 +163,7 @@ def create_product():
         return response
 
 
+# This function fetches all the products in the database.
 @app.route('/get-product/', methods=["GET"])
 def get_product():
     response = {}
@@ -162,6 +178,7 @@ def get_product():
     return response
 
 
+# This function allows you to delete products from the database.
 @app.route("/delete-product/<int:product_id>/")
 def delete_product(product_id):
     response = {}
@@ -175,6 +192,7 @@ def delete_product(product_id):
     return response
 
 
+# The view one function lets you view one product of choice.
 @app.route('/view-one/<int:product_id>/')
 def view_one_product(product_id):
     response = {}
@@ -189,6 +207,7 @@ def view_one_product(product_id):
         return jsonify(response)
 
 
+# Edit function allow you to edit products name, price, category or description.
 @app.route('/edit-product/<int:product_id>/', methods=["PUT"])
 # @jwt_required()
 def edit_product(product_id):
@@ -235,6 +254,7 @@ def edit_product(product_id):
     return response
 
 
+# This function allows you to delete products from the database.
 @app.route('/get-product/<int:product_id>/', methods=["GET"])
 def get_post(product_id):
     response = {}
