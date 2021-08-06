@@ -1,5 +1,6 @@
 # These are all my imports which run in the background of my programme.
 import hmac
+import unittest
 import sqlite3
 from flask_mail import Mail, Message
 from flask import Flask, request, jsonify
